@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Form Validator</title>
+    <style>
+        .form-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        input.valid {
+            border-color: #28a745;
+        }
+        
+        input.invalid {
+            border-color: #dc3545;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        button[type="submit"]:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Sign Up Form</h2>
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username">
+                <div class="error-message" id="usernameError"></div>
+            </div>
+            
+             <!-- TODO: Add email field -->
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="text" id="email" name="email" class="form-control" maxlength="50" placeholder="Enter your email">
+                <div class="error-message" id="emailError"></div>
+            </div>
+
+              <!-- TODO: Add password field -->
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" maxlength="50" placeholder="Enter your password">
+                <div class="error-message" id="passwordError"></div>
+            </div>
+
+            <!-- TODO: Add confirm password field -->
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" maxlength="50" placeholder="Confirm your password">
+                <div class="error-message" id="confirmPasswordError"></div>
+            </div>
+            
+            <button type="submit" id="submitBtn" disabled>Sign Up</button>
+
+        </form>
+    </div>
+
+    <script>
+        // TODO: Implement validation functions
+
+        function validateUsername(username) {
+            // TODO: Check length (4-20) and alphanumeric
+            const usernameRegex = /^[a-zA-Z0-9]{4,20}$/;
+            return usernameRegex.test(username);
+        }
+        
+        function validateEmail(email) {
+            // TODO: Use regex for email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+        function validatePassword(password) {
+            // TODO: Check length >= 8, has uppercase, has number
+            const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+            return passwordRegex.test(password);
+        }
+        
+        function validatePasswordMatch(pass1, pass2) {
+            // TODO: Compare passwords
+            if (pass1 !== pass2) {
+                console.log("Passwords do not match");
+                return false;
+            }
+            return true;
+        }
+        
+        function showError(fieldId, message) {
+            // TODO: Display error message
+            const errorDiv = document.getElementById(fieldId + 'Error');
+            const input = document.getElementById(fieldId);
+            if (!errorDiv || !input) return;
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            input.classList.remove('valid');
+            input.classList.add('invalid');
+        }
+        
+        function clearError(fieldId) {
+            // TODO: Clear error message
+            const errorDiv = document.getElementById(fieldId + 'Error');
+            const input = document.getElementById(fieldId);
+            if (!errorDiv || !input) return;
+            errorDiv.textContent = '';
+            errorDiv.classList.remove('show');
+            input.classList.remove('invalid');
+            input.classList.add('valid');
+        }
+        
+        function validateForm() {
+            // TODO: Validate all fields and enable/disable submit
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            let valid = true;
+
+            // Username validation
+            if (!validateUsername(username)) {
+                showError('username', 'Username must be 4-20 alphanumeric characters.');
+                valid = false;
+            } else {
+                clearError('username');
+            }
+
+            // Email validation
+            if (!validateEmail(email)) {
+                showError('email', 'Enter a valid email address.');
+                valid = false;
+            } else {
+                clearError('email');
+            }
+
+            // Password validation
+            if (!validatePassword(password)) {
+                showError('password', 'Password must be at least 8 chars, include an uppercase letter and a number.');
+                valid = false;
+            } else {
+                clearError('password');
+            }
+
+            // Confirm password validation
+            if (!validatePasswordMatch(password, confirmPassword)) {
+                showError('confirmPassword', 'Passwords do not match.');
+                valid = false;
+            } else {
+                clearError('confirmPassword');
+            }
+
+            // Enable/disable submit button
+            document.getElementById('submitBtn').disabled = !valid;
+            return valid;
+        }
+        
+        // TODO: Add event listeners for real-time validation
+        ['username','email','password','confirmPassword'].forEach(id=>{
+            const el=document.getElementById(id);
+            if(!el) return;
+            el.addEventListener('input', validateForm);
+        });
+
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // TODO: Handle form submission
+            alert('Form submitted successfully!');
+        });
+    </script>
+</body>
+</html>
