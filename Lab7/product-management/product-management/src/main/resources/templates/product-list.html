@@ -136,6 +136,56 @@
             display: flex;
             gap: 5px;
         }
+        
+        .filter-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .filter-form input,
+        .filter-form select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 20px;
+        }
+        
+        .pagination a,
+        .pagination span {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            text-decoration: none;
+            color: #667eea;
+        }
+        
+        .pagination .active {
+            background-color: #667eea;
+            color: white;
+        }
+        
+        .sort-link {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .sort-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -154,7 +204,10 @@
         
         <!-- Actions -->
         <div class="actions">
-            <a th:href="@{/products/new}" class="btn btn-primary">➕ Add New Product</a>
+            <div>
+                <a th:href="@{/products/new}" class="btn btn-primary">➕ Add New Product</a>
+                <a th:href="@{/dashboard}" class="btn btn-success">📊 Dashboard</a>
+            </div>
             
             <form th:action="@{/products/search}" method="get" class="search-form">
                 <input type="text" name="keyword" th:value="${keyword}" placeholder="Search products..." />
@@ -162,17 +215,71 @@
             </form>
         </div>
         
+        <!-- Advanced Search & Filter -->
+        <div class="filter-section">
+            <h3>🔍 Advanced Search & Filter</h3>
+            <form th:action="@{/products/advanced-search}" method="get" class="filter-form">
+                <input type="text" name="name" th:value="${searchName}" placeholder="Product Name" />
+                <select name="category">
+                    <option value="">All Categories</option>
+                    <option th:each="cat : ${categories}" 
+                            th:value="${cat}" 
+                            th:text="${cat}"
+                            th:selected="${cat == searchCategory}">Category</option>
+                </select>
+                <input type="number" name="minPrice" th:value="${searchMinPrice}" placeholder="Min Price" step="0.01" />
+                <input type="number" name="maxPrice" th:value="${searchMaxPrice}" placeholder="Max Price" step="0.01" />
+                <button type="submit" class="btn btn-primary">Search</button>
+                <a th:href="@{/products}" class="btn btn-secondary">Clear</a>
+            </form>
+            
+            <!-- Category Filter Buttons -->
+            <div style="margin-top: 10px;">
+                <strong>Quick Filter:</strong>
+                <a th:href="@{/products}" class="btn btn-sm" th:classappend="${selectedCategory == null} ? 'btn-primary' : 'btn-secondary'">All</a>
+                <a th:each="cat : ${categories}" 
+                   th:href="@{/products(category=${cat})}" 
+                   th:text="${cat}"
+                   class="btn btn-sm"
+                   th:classappend="${cat == selectedCategory} ? 'btn-primary' : 'btn-secondary'">Category</a>
+            </div>
+        </div>
+        
         <!-- Products Table -->
         <div th:if="${products != null and !products.isEmpty()}">
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Code</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Category</th>
+                        <th>
+                            <a th:href="@{/products(sortBy='id',sortDir=${sortDir=='asc'?'desc':'asc'},category=${selectedCategory})}" class="sort-link">
+                                ID <span th:if="${sortBy=='id'}" th:text="${sortDir=='asc'?'↑':'↓'}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a th:href="@{/products(sortBy='productCode',sortDir=${sortDir=='asc'?'desc':'asc'},category=${selectedCategory})}" class="sort-link">
+                                Code <span th:if="${sortBy=='productCode'}" th:text="${sortDir=='asc'?'↑':'↓'}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a th:href="@{/products(sortBy='name',sortDir=${sortDir=='asc'?'desc':'asc'},category=${selectedCategory})}" class="sort-link">
+                                Name <span th:if="${sortBy=='name'}" th:text="${sortDir=='asc'?'↑':'↓'}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a th:href="@{/products(sortBy='price',sortDir=${sortDir=='asc'?'desc':'asc'},category=${selectedCategory})}" class="sort-link">
+                                Price <span th:if="${sortBy=='price'}" th:text="${sortDir=='asc'?'↑':'↓'}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a th:href="@{/products(sortBy='quantity',sortDir=${sortDir=='asc'?'desc':'asc'},category=${selectedCategory})}" class="sort-link">
+                                Quantity <span th:if="${sortBy=='quantity'}" th:text="${sortDir=='asc'?'↑':'↓'}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a th:href="@{/products(sortBy='category',sortDir=${sortDir=='asc'?'desc':'asc'},category=${selectedCategory})}" class="sort-link">
+                                Category <span th:if="${sortBy=='category'}" th:text="${sortDir=='asc'?'↑':'↓'}"></span>
+                            </a>
+                        </th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -182,7 +289,7 @@
                         <td th:text="${product.productCode}">P001</td>
                         <td th:text="${product.name}">Product Name</td>
                         <td th:text="'$' + ${#numbers.formatDecimal(product.price, 1, 2)}">$99.99</td>
-                        <td th:text="${product.quantity}">10</td>
+                        <td th:text="${product.quantity}" th:classappend="${product.quantity < 10} ? 'text-danger' : ''">10</td>
                         <td th:text="${product.category}">Electronics</td>
                         <td>
                             <div class="actions-column">
@@ -197,6 +304,27 @@
                     </tr>
                 </tbody>
             </table>
+            
+            <!-- Pagination -->
+            <div th:if="${totalPages != null and totalPages > 1}" class="pagination">
+                <a th:if="${currentPage > 0}" 
+                   th:href="@{/products/search(keyword=${keyword},page=${currentPage-1},size=10)}"
+                   class="btn btn-sm">← Previous</a>
+                
+                <span th:each="i : ${#numbers.sequence(0, totalPages-1)}">
+                    <a th:if="${i == currentPage}" 
+                       class="btn btn-sm active"
+                       th:text="${i+1}">1</a>
+                    <a th:if="${i != currentPage}" 
+                       th:href="@{/products/search(keyword=${keyword},page=${i},size=10)}"
+                       class="btn btn-sm"
+                       th:text="${i+1}">1</a>
+                </span>
+                
+                <a th:if="${currentPage < totalPages-1}" 
+                   th:href="@{/products/search(keyword=${keyword},page=${currentPage+1},size=10)}"
+                   class="btn btn-sm">Next →</a>
+            </div>
         </div>
         
         <!-- Empty State -->

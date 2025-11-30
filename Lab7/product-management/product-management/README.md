@@ -58,11 +58,38 @@ Search (helper read operation):
 
 **Key files & locations**
 - `src/main/java/com/example/productmanagement/controller/ProductController.java` — web endpoints and UI flow.
+- `src/main/java/com/example/productmanagement/controller/DashboardController.java` — statistics dashboard controller.
 - `src/main/java/com/example/productmanagement/service/ProductService.java` — service interface.
 - `src/main/java/com/example/productmanagement/service/ProductServiceImpl.java` — business logic (calls repository).
 - `src/main/java/com/example/productmanagement/repository/ProductRepository.java` — Spring Data JPA repository (extends `JpaRepository<Product, Long>`).
-- `src/main/java/com/example/productmanagement/entity/Product.java` — JPA entity mapping.
-- `src/main/resources/templates/product-list.html` & `product-form.html` — Thymeleaf templates for list and form UI.
+- `src/main/java/com/example/productmanagement/entity/Product.java` — JPA entity mapping with validation annotations.
+- `src/main/resources/templates/product-list.html` — Thymeleaf template for list with sorting, filtering, and pagination.
+- `src/main/resources/templates/product-form.html` — Thymeleaf template for form with validation error display.
+- `src/main/resources/templates/dashboard.html` — Statistics dashboard view.
+
+**Homework Features Implemented (Part B)**
+
+Exercise 5: Advanced Search (12 points) ✅
+- Multi-criteria search (name, category, price range)
+- Category filter dropdown with all unique categories
+- Search with pagination support
+
+Exercise 6: Validation (10 points) ✅
+- Validation annotations on Product entity (@NotBlank, @Size, @Pattern, @DecimalMin, @DecimalMax, @Min)
+- Validation in controller with @Valid and BindingResult
+- Validation error display in product-form.html with error styling
+
+Exercise 7: Sorting & Filtering (10 points) ✅
+- Sorting by all columns (id, code, name, price, quantity, category) in ascending/descending order
+- Category filter with quick filter buttons
+- Combined sorting and filtering in one interface
+
+Exercise 8: Statistics Dashboard (8 points) ✅
+- Dashboard showing total products count, total inventory value, average price
+- Products by category with counts
+- Low stock alerts (quantity < 10)
+- Recent products (last 5 added)
+- Accessible at http://localhost:8080/dashboard
 
 If you want, I can:
 - Start the app now and show the console output.
